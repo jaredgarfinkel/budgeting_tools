@@ -25,6 +25,17 @@ scale_fill_discrete = scale_fill_viridis_d
 theme_set(theme_minimal() + theme(legend.position = "bottom"))
 ```
 
+This retirement calculator takes your starting age, ending age, expected annual percent yield, starting amount in savings, and annual contributions. It calculates your years until retirement and the annualized growth of each year of contributions and the final amount of your initial investment with the compound interest formula. Then it sums up each year of contributions with compound interest. The result is how much you might have in retirement given the chosen market conditions.
+
+Here are some useful metrics for approximate market performance:
+
+Performance   | Annual Percent Yield
+--------------|----------------------
+Excellent     | 9%
+Great         | 7%
+Average       | 5%
+Below Average | 3%
+
 ```{r}
 a_e = function(start_age, end_age, apy, start_amt, annual_contrib) {
   years = end_age-start_age
@@ -40,13 +51,19 @@ a_e = function(start_age, end_age, apy, start_amt, annual_contrib) {
 ```
 
 ```{r}
-result = a_e(33, 71, 0.05, 90000, 25000)
+result = a_e(33, 71, 0.04, 90000, 20000)
 # flatten_dbl(result)
 result_df = tibble(x = result) |> 
   unnest(x) |> 
   mutate(y = cumsum(x)) |> 
   reframe(final = max(y))
-result_df
-result
+table = tibble(ret_amt = result_df, annual_wd = result_df*0.04) |> 
+  unnest(ret_amt = ret_amt) |> 
+  unnest(final1 = annual_wd) |> 
+  select(-annual_wd)
+table
+# result_df
+# result_df*0.04 # annual withdrawal (4% rule)
+# result
 ```
 
