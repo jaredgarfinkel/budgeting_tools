@@ -1,0 +1,52 @@
+---
+title: "20240223-budgeting_tools-retirement_calculator"
+author: "Jared Garfinkel"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r}
+library(tidyverse)
+library(viridis)
+knitr::opts_chunk$set(
+  echo = FALSE,
+	warning = FALSE,
+	message = FALSE,
+  fig.height = 6,
+  fig.width = 8,
+  out.width = "90%"
+)
+options(
+  ggplot2.continuous.colour = "viridis",
+  ggplot2.continuous.fill = "viridis"
+)
+scale_colour_discrete = scale_colour_viridis_d
+scale_fill_discrete = scale_fill_viridis_d
+theme_set(theme_minimal() + theme(legend.position = "bottom"))
+```
+
+```{r}
+a_e = function(start_age, end_age, apy, start_amt, annual_contrib) {
+  years = end_age-start_age
+  years_list = seq(1, years, by = 1)
+  # years_list = rev(years_list)
+  output = NULL
+  for (i in 1:length(years_list)) {
+    output[[i]] = if_else(i %in% c(1:(years-1)), annual_contrib*(1+apy)^years_list[[i]], start_amt*(1+apy)^years_list[[i]])
+  }
+  result = flatten(output)
+  return(result)
+}
+```
+
+```{r}
+result = a_e(33, 71, 0.05, 90000, 20000)
+# flatten_dbl(result)
+result_df = tibble(x = result) |> 
+  unnest(x) |> 
+  mutate(y = cumsum(x)) |> 
+  reframe(final = max(y))
+result_df
+result
+```
+
