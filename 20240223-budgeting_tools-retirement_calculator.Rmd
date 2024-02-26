@@ -40,7 +40,7 @@ a_e = function(start_age, end_age, apy, start_amt, annual_contrib) {
 ```
 
 ```{r}
-result = a_e(33, 71, 0.05, 90000, 20000)
+result = a_e(33, 71, 0.05, 90000, 25000)
 # flatten_dbl(result)
 result_df = tibble(x = result) |> 
   unnest(x) |> 
